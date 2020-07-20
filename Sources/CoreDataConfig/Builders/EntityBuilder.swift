@@ -30,7 +30,7 @@ public struct EntityBuilder {
     
     // MARK: - Methods
     
-    public static func buildBlock(_ items: Entity...) -> [Entity] {
-        items
+    public static func buildBlock(_ items: EntityWrapper...) -> [Entity] {
+        items.map(\.entity)
     }
 }

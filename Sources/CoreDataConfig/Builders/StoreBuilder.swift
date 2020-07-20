@@ -10,7 +10,7 @@ public struct StoreBuilder {
     
     // MARK: - Methods
     
-    public static func buildBlock(_ items: ModelVersion...) -> [ModelVersion] {
-        return items
+    public static func buildBlock(_ items: EntityWrapper...) -> Model {
+        Model(entities: items.map(\.entity))
     }
 }
