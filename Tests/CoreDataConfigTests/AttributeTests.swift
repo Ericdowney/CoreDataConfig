@@ -3,14 +3,14 @@ import XCTest
 @testable import CoreDataConfig
 
 final class AttributeTests: XCTestCase {
-    
+
     // MARK: - Tests
-    
+
     func test_shouldCreateAttributeDescriptionWithDefaults() throws {
         let subject = Attribute("TestAttribute", type: .string)
-        
+
         let result = try subject.createAttributeDescription()
-        
+
         XCTAssertEqual(result.name, "TestAttribute")
         XCTAssertEqual(result.attributeType, .stringAttributeType)
         XCTAssertFalse(result.isTransient)
@@ -23,7 +23,7 @@ final class AttributeTests: XCTestCase {
         XCTAssertNil(result.valueTransformerName)
         XCTAssertFalse(result.preservesValueInHistoryOnDeletion)
     }
-    
+
     func test_shouldCreateAttributeDescriptionWithAllPropertiesSet() throws {
         let subject = Attribute("TestAttribute", type: .string)
             .isTransient(false)
@@ -35,9 +35,9 @@ final class AttributeTests: XCTestCase {
             .preservesValueInHistoryOnDeletion(true)
             .defaultValue("Hello")
             .renamingIdentifier("_TestAttribute")
-        
+
         let result = try subject.createAttributeDescription()
-        
+
         XCTAssertEqual(result.name, "TestAttribute")
         XCTAssertEqual(result.attributeType, .stringAttributeType)
         XCTAssertFalse(result.isTransient)
@@ -50,7 +50,7 @@ final class AttributeTests: XCTestCase {
         XCTAssertEqual(result.valueTransformerName, "SomeValueTransformer")
         XCTAssertTrue(result.preservesValueInHistoryOnDeletion)
     }
-    
+
     func test_shouldThrowErrorWhenAttributeIsInvalid() throws {
         let subject = Attribute("TestAttribute", type: .string)
             .isTransient(true)
@@ -62,10 +62,10 @@ final class AttributeTests: XCTestCase {
             .preservesValueInHistoryOnDeletion(true)
             .defaultValue("Hello")
             .renamingIdentifier("_TestAttribute")
-        
+
         XCTAssertThrowsError(try subject.createAttributeDescription())
     }
-    
+
     func test_shouldValidateAttributeProperties() throws {
         let invalidSubject = Attribute("TestAttribute", type: .string)
             .isTransient(true)
@@ -79,15 +79,15 @@ final class AttributeTests: XCTestCase {
         let validSubject3 = Attribute("TestAttribute", type: .string)
             .isTransient(false)
             .isIndexedBySpotlight(false)
-        
+
         XCTAssertFalse(invalidSubject.isValid)
         XCTAssertTrue(validSubject1.isValid)
         XCTAssertTrue(validSubject2.isValid)
         XCTAssertTrue(validSubject3.isValid)
     }
-    
+
     // MARK: - Test Registration
-    
+
     static var allTests = [
         ("test_shouldCreateAttributeDescriptionWithDefaults", test_shouldCreateAttributeDescriptionWithDefaults),
         ("test_shouldCreateAttributeDescriptionWithAllPropertiesSet", test_shouldCreateAttributeDescriptionWithAllPropertiesSet),

@@ -10,14 +10,14 @@ final class RelationshipUtility {
 
     // MARK: - Methods
     
-    class func resolveInverseRelationships(for objects: [(entity: Entity, description: NSEntityDescription)]) {
+    class func resolveInverseRelationships<Identifier: EntityIdentifiable>(for objects: [(entity: Entity<Identifier>, description: NSEntityDescription)]) {
         objects.forEach { object in
-            let relationshipPairs: [(Relationship, NSRelationshipDescription)] = object.description.relationshipsByName.compactMap { item in
+            let relationshipPairs: [(Relationship<Identifier>, NSRelationshipDescription)] = object.description.relationshipsByName.compactMap { item in
                 guard let relationship = object.entity.relationships.first(where: { $0.name == item.value.name }) else { return nil }
                 return (relationship, item.value)
             }
             relationshipPairs.forEach { pair in
-                if let inverseRelationship = findRelationship(byDestinationName: pair.0.name, inverseName: pair.0.inverse, onEntity: pair.0.entityName, in: objects.map { $0.description }) {
+                if let inverseRelationship = findRelationship(byDestinationName: pair.0.name, inverseName: pair.0.inverse, onEntity: pair.0.destination, in: objects.map { $0.description }) {
                     inverseRelationship.inverseRelationship = pair.1
                     pair.1.inverseRelationship = inverseRelationship
                 }
@@ -25,11 +25,11 @@ final class RelationshipUtility {
         }
     }
     
-    private class func findRelationship(byDestinationName: String, inverseName: String, onEntity entityName: String, in entities: [NSEntityDescription]) -> NSRelationshipDescription? {
+    private class func findRelationship<Identifier: EntityIdentifiable>(byDestinationName: String, inverseName: String, onEntity entityIdentifier: Identifier, in entities: [NSEntityDescription]) -> NSRelationshipDescription? {
         for entity in entities {
-            if entity.name == entityName {
+            if entity.name == entityIdentifier.name {
                 return entity.relationshipsByName.first { (key: String, value: NSRelationshipDescription) in
-                    key == inverseName && value.destinationEntity?.name == entityName
+                    key == inverseName && value.destinationEntity?.name == entityIdentifier.name
                 }?.value
             }
         }

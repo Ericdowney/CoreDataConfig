@@ -2,7 +2,7 @@
 import Foundation
 import CoreData
 
-public struct Relationship: Equatable, Codable {
+public struct Relationship<Identifier: EntityIdentifiable>: Equatable, Codable {
     public enum RelationshipType: Int, Codable {
         case toOne, toMany
     }
@@ -38,7 +38,7 @@ public struct Relationship: Equatable, Codable {
     // MARK: - Properties
     
     var name: String
-    var entityName: String
+    var destination: Identifier
     var inverse: String
     var type: RelationshipType = .toOne
     var isTransient: Bool = false
@@ -50,15 +50,15 @@ public struct Relationship: Equatable, Codable {
     // MARK: - Lifecycle
     
     public init(_ name: String,
-                entity: String,
+                destination: Identifier,
                 inverse: String) {
         self.name = name
-        self.entityName = entity
+        self.destination = destination
         self.inverse = inverse
     }
     
     init(_ name: String,
-         entity: String,
+         entity: Identifier,
          inverse: String,
          type: RelationshipType,
          isTransient: Bool,
@@ -67,7 +67,7 @@ public struct Relationship: Equatable, Codable {
          arrangement: Arrangement,
          indexInSpotlight: Bool) {
         self.name = name
-        self.entityName = entity
+        self.destination = entity
         self.inverse = inverse
         self.type = type
         self.isTransient = isTransient
@@ -81,7 +81,7 @@ public struct Relationship: Equatable, Codable {
     
     public func type(_ value: RelationshipType) -> Self {
         .init(name,
-              entity: entityName,
+              entity: destination,
               inverse: inverse,
               type: value,
               isTransient: isTransient,
@@ -93,7 +93,7 @@ public struct Relationship: Equatable, Codable {
     
     public func isTransient(_ value: Bool) -> Self {
         .init(name,
-              entity: entityName,
+              entity: destination,
               inverse: inverse,
               type: type,
               isTransient: value,
@@ -105,7 +105,7 @@ public struct Relationship: Equatable, Codable {
     
     public func isOptional(_ value: Bool) -> Self {
         .init(name,
-              entity: entityName,
+              entity: destination,
               inverse: inverse,
               type: type,
               isTransient: isTransient,
@@ -117,7 +117,7 @@ public struct Relationship: Equatable, Codable {
     
     public func deleteRule(_ value: DeleteRule) -> Self {
         .init(name,
-              entity: entityName,
+              entity: destination,
               inverse: inverse,
               type: type,
               isTransient: isTransient,
@@ -129,7 +129,7 @@ public struct Relationship: Equatable, Codable {
     
     public func arrangement(_ value: Arrangement) -> Self {
         .init(name,
-              entity: entityName,
+              entity: destination,
               inverse: inverse,
               type: type,
               isTransient: isTransient,
@@ -141,7 +141,7 @@ public struct Relationship: Equatable, Codable {
     
     public func arrangement(isOrdered: Bool, lowerBound: Int? = nil, upperBound: Int? = nil, isMinimum: Bool? = nil, isMaximum: Bool? = nil) -> Self {
         .init(name,
-              entity: entityName,
+              entity: destination,
               inverse: inverse,
               type: type,
               isTransient: isTransient,
@@ -153,7 +153,7 @@ public struct Relationship: Equatable, Codable {
     
     public func indexInSpotlight(_ value: Bool) -> Self {
         .init(name,
-              entity: entityName,
+              entity: destination,
               inverse: inverse,
               type: type,
               isTransient: isTransient,

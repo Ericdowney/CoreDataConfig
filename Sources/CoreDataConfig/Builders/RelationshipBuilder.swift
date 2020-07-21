@@ -10,7 +10,7 @@ public struct RelationshipBuilder {
     
     // MARK: - Methods
     
-    public static func buildBlock(_ items: Relationship...) -> Entity.Relationships {
+    public static func buildBlock<Identifier: EntityIdentifiable>(_ items: Relationship<Identifier>...) -> [Relationship<Identifier>] {
         items
     }
 }

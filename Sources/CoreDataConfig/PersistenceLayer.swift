@@ -47,9 +47,9 @@ open class PersistenceLayer<S: Store> {
                                  forConfigurationName: store.model.configurationName)
     }
     
-    private static func resolveEntities(from entities: [Entity]) throws -> [NSEntityDescription] {
+    private static func resolveEntities(from entities: [Entity<S.Identifier>]) throws -> [NSEntityDescription] {
         let flattendEntities = entities.map { [$0] + $0.children }.reduce([], +)
-        let objects: [(Entity, NSEntityDescription)] = try entities.compactMap { try $0.createEntityDescriptions() }.reduce([], +).compactMap { description in
+        let objects: [(Entity<S.Identifier>, NSEntityDescription)] = try entities.compactMap { try $0.createEntityDescriptions() }.reduce([], +).compactMap { description in
             guard let entity = flattendEntities.first(where: { $0.name == description.name }) else { return nil }
             return (entity, description)
         }

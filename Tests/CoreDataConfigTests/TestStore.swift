@@ -2,193 +2,213 @@
 import Foundation
 import CoreDataConfig
 
-struct ComicBookStore: Store {
+enum ComicBookIdentifiers: String, EntityIdentifiable {
+    case baseObject, publisher, series, event, box, tag, comicBook
     
+    var name: String {
+        switch self {
+        case .baseObject: return "BaseObject"
+        case .publisher: return "Publisher"
+        case .series: return "Series"
+        case .event: return "Event"
+        case .box: return "Box"
+        case .tag: return "Tag"
+        case .comicBook: return "ComicBook"
+        }
+    }
+}
+
+struct ComicBookStore: Store {
+
     var name: String { "Comics" }
-    var model: Model {
-        BaseObject {
-            Publisher()
-            Series()
-            Event()
-            Box()
-            Tag()
-            ComicBook()
+    var model: Model<ComicBookIdentifiers> {
+        Model<ComicBookIdentifiers> {
+            BaseObject {
+                Publisher()
+                Series()
+                Event()
+                Box()
+                Tag()
+                ComicBook()
+            }
         }
     }
 }
 
 struct BaseObject: EntityWrapper {
-    
-    var entity: Entity {
-        Entity("BaseObject", {
-            
+
+    var entity: Entity<ComicBookIdentifiers> {
+        Entity(.baseObject, attributes: {
+
             Attribute("id", type: .uuid)
                 .isOptional(false)
-            
+
             Attribute("createdAt", type: .date)
                 .isOptional(false)
-            
+
             Attribute("modifiedAt", type: .date)
                 .isOptional(false)
-            
+
         }, children: children)
         .isAbstract(true)
         .renamingIdentifier("_BaseObject")
     }
-    var children: () -> [Entity]
-    
-    init(@EntityBuilder _ children: @escaping () -> [Entity]) {
+    var children: () -> [Entity<ComicBookIdentifiers>]
+
+    init(@EntityBuilder _ children: @escaping () -> [Entity<ComicBookIdentifiers>]) {
         self.children = children
     }
 }
 
 struct Publisher: EntityWrapper {
     
-    var entity: Entity {
-        Entity("Publisher") {
-            
+    var entity: Entity<ComicBookIdentifiers> {
+        Entity(.publisher) {
+
             Attribute("name", type: .string)
                 .isOptional(false)
-            
+
         } relationships: {
-            
-            Relationship("series", entity: "Series", inverse: "publisher")
+
+            Relationship<ComicBookIdentifiers>("series", destination: .series, inverse: "publisher")
                 .type(.toMany)
                 .deleteRule(.cascade)
-            
-            Relationship("events", entity: "Event", inverse: "publisher")
+
+            Relationship<ComicBookIdentifiers>("events", destination: .event, inverse: "publisher")
                 .type(.toMany)
                 .deleteRule(.cascade)
-            
+
         }
         .renamingIdentifier("_Publisher")
     }
 }
 
 struct Series: EntityWrapper {
-    
-    var entity: Entity {
-        Entity("Series") {
-            
+
+    var entity: Entity<ComicBookIdentifiers> {
+        Entity(.series) {
+
             Attribute("name", type: .string)
                 .isOptional(false)
-            
+
         } relationships: {
-            
-            Relationship("publisher", entity: "Publisher", inverse: "series")
+
+            Relationship<ComicBookIdentifiers>("publisher", destination: .publisher, inverse: "series")
                 .type(.toOne)
                 .deleteRule(.nullify)
-            
-            Relationship("comicBooks", entity: "ComicBook", inverse: "series")
+
+            Relationship<ComicBookIdentifiers>("comicBooks", destination: .comicBook, inverse: "series")
                 .type(.toMany)
                 .deleteRule(.cascade)
-            
+
         }
         .renamingIdentifier("_Series")
     }
+    
+    init() {}
 }
 
 struct Event: EntityWrapper {
-    
-    var entity: Entity {
-        Entity("Event") {
-            
+
+    var entity: Entity<ComicBookIdentifiers> {
+        Entity(.event) {
+
             Attribute("name", type: .string)
                 .isOptional(false)
-            
+
         } relationships: {
-            
-            Relationship("publisher", entity: "Publisher", inverse: "events")
+
+            Relationship<ComicBookIdentifiers>("publisher", destination: .publisher, inverse: "events")
                 .type(.toOne)
                 .deleteRule(.nullify)
-            
-            Relationship("comicBooks", entity: "ComicBook", inverse: "event")
+
+            Relationship<ComicBookIdentifiers>("comicBooks", destination: .comicBook, inverse: "event")
                 .type(.toMany)
                 .deleteRule(.nullify)
                 .arrangement(isOrdered: true)
-            
+
         }
         .renamingIdentifier("_Event")
     }
 }
 
 struct Box: EntityWrapper {
-    
-    var entity: Entity {
-        Entity("Box") {
-            
+
+    var entity: Entity<ComicBookIdentifiers> {
+        Entity(.box) {
+
             Attribute("name", type: .string)
                 .isOptional(false)
-            
+
         } relationships: {
-            
-            Relationship("comicBooks", entity: "ComicBook", inverse: "box")
+
+            Relationship<ComicBookIdentifiers>("comicBooks", destination: .comicBook, inverse: "box")
                 .type(.toMany)
                 .deleteRule(.nullify)
                 .arrangement(isOrdered: true)
-            
+
         }
         .renamingIdentifier("_Box")
     }
 }
 
 struct Tag: EntityWrapper {
-    
-    var entity: Entity {
-        Entity("Tag") {
-            
+
+    var entity: Entity<ComicBookIdentifiers> {
+        Entity(.tag) {
+
             Attribute("name", type: .string)
                 .isOptional(false)
-            
+
         } relationships: {
-            
-            Relationship("comicBooks", entity: "ComicBook", inverse: "tags")
+
+            Relationship<ComicBookIdentifiers>("comicBooks", destination: .comicBook, inverse: "tags")
                 .type(.toMany)
                 .deleteRule(.nullify)
-            
+
         }
         .renamingIdentifier("_Tag")
     }
 }
 
 struct ComicBook: EntityWrapper {
-    
-    var entity: Entity {
-        Entity("ComicBook") {
-            
+
+    var entity: Entity<ComicBookIdentifiers> {
+        Entity(.comicBook) {
+
             Attribute("upc", type: .string)
-            
+
             Attribute("price", type: .double)
-            
+
             Attribute("issueNum", type: .int16)
                 .isOptional(false)
-            
+
             Attribute("volumeNum", type: .int16)
-            
+
             Attribute("releaseDate", type: .date)
                 .isOptional(false)
-            
+
             Attribute("coverImageData", type: .data)
-            
+
         } relationships: {
-            
-            Relationship("box", entity: "Box", inverse: "comicBooks")
+
+            Relationship<ComicBookIdentifiers>("box", destination: .box, inverse: "comicBooks")
                 .type(.toOne)
                 .deleteRule(.nullify)
                 .arrangement(isOrdered: true)
-            
-            Relationship("series", entity: "Series", inverse: "comicBooks")
+
+            Relationship<ComicBookIdentifiers>("series", destination: .series, inverse: "comicBooks")
                 .type(.toOne)
                 .deleteRule(.nullify)
-            
-            Relationship("tags", entity: "Tag", inverse: "comicBooks")
+
+            Relationship<ComicBookIdentifiers>("tags", destination: .tag, inverse: "comicBooks")
                 .type(.toMany)
                 .deleteRule(.nullify)
-            
-            Relationship("event", entity: "Event", inverse: "comicBooks")
+
+            Relationship<ComicBookIdentifiers>("event", destination: .event, inverse: "comicBooks")
                 .type(.toOne)
                 .deleteRule(.nullify)
-            
+
         }
         .renamingIdentifier("_ComicBook")
     }

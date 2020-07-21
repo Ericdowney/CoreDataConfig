@@ -355,11 +355,11 @@ public struct Attribute: Equatable, Codable {
 
 extension Attribute {
     enum Errors: Error {
-        case invalidAttribute(Entity?, Attribute)
+        case invalidAttribute(Attribute)
     }
     
-    func createAttributeDescription(_ debugEntity: Entity? = nil) throws -> NSAttributeDescription {
-        guard isValid else { throw Errors.invalidAttribute(debugEntity, self) }
+    func createAttributeDescription() throws -> NSAttributeDescription {
+        guard isValid else { throw Errors.invalidAttribute(self) }
         
         let description = NSAttributeDescription()
         description.name = name
