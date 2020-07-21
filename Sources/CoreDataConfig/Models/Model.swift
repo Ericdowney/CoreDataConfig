@@ -1,8 +1,6 @@
 
 import Foundation
 
-// MARK: Model
-
 public struct Model<Identifier: EntityIdentifiable>: Equatable, Codable {
     
     // MARK: - Properties
@@ -17,10 +15,10 @@ public struct Model<Identifier: EntityIdentifiable>: Equatable, Codable {
         self.entities = entities()
     }
     
-//    init(configurationName: String = "Default", entities: [Entity<Identifier>]) {
-//        self.configurationName = configurationName
-//        self.entities = entities
-//    }
+    public init(configurationName: String = "Default", entities: [Entity<Identifier>]) {
+        self.configurationName = configurationName
+        self.entities = entities
+    }
     
     // MARK: - Methods
 }

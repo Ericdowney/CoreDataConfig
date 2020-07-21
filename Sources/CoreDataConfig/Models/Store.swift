@@ -1,8 +1,6 @@
 
 import Foundation
 
-// MARK: Store
-
 public protocol Store: Equatable, Codable {
     associatedtype Identifier: EntityIdentifiable
     

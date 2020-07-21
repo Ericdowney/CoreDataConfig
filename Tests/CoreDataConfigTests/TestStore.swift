@@ -2,7 +2,7 @@
 import Foundation
 import CoreDataConfig
 
-enum ComicBookIdentifiers: String, EntityIdentifiable {
+enum ComicBookIdentifier: String, EntityIdentifiable {
     case baseObject, publisher, series, event, box, tag, comicBook
     
     var name: String {
@@ -21,15 +21,15 @@ enum ComicBookIdentifiers: String, EntityIdentifiable {
 struct ComicBookStore: Store {
 
     var name: String { "Comics" }
-    var model: Model<ComicBookIdentifiers> {
-        Model<ComicBookIdentifiers> {
+    var model: Model<ComicBookIdentifier> {
+        Model {
             BaseObject {
-                Publisher()
-                Series()
-                Event()
-                Box()
-                Tag()
-                ComicBook()
+                Publisher().eraseToAny()
+                Series().eraseToAny()
+                Event().eraseToAny()
+                Box().eraseToAny()
+                Tag().eraseToAny()
+                ComicBook().eraseToAny()
             }
         }
     }
@@ -37,7 +37,7 @@ struct ComicBookStore: Store {
 
 struct BaseObject: EntityWrapper {
 
-    var entity: Entity<ComicBookIdentifiers> {
+    var entity: Entity<ComicBookIdentifier> {
         Entity(.baseObject, attributes: {
 
             Attribute("id", type: .uuid)
@@ -53,16 +53,16 @@ struct BaseObject: EntityWrapper {
         .isAbstract(true)
         .renamingIdentifier("_BaseObject")
     }
-    var children: () -> [Entity<ComicBookIdentifiers>]
+    var children: () -> [Entity<ComicBookIdentifier>]
 
-    init(@EntityBuilder _ children: @escaping () -> [Entity<ComicBookIdentifiers>]) {
+    init(@EntityBuilder _ children: @escaping () -> [Entity<ComicBookIdentifier>]) {
         self.children = children
     }
 }
 
 struct Publisher: EntityWrapper {
     
-    var entity: Entity<ComicBookIdentifiers> {
+    var entity: Entity<ComicBookIdentifier> {
         Entity(.publisher) {
 
             Attribute("name", type: .string)
@@ -70,11 +70,11 @@ struct Publisher: EntityWrapper {
 
         } relationships: {
 
-            Relationship<ComicBookIdentifiers>("series", destination: .series, inverse: "publisher")
+            Relationship<ComicBookIdentifier>("series", destination: .series, inverse: "publisher")
                 .type(.toMany)
                 .deleteRule(.cascade)
 
-            Relationship<ComicBookIdentifiers>("events", destination: .event, inverse: "publisher")
+            Relationship<ComicBookIdentifier>("events", destination: .event, inverse: "publisher")
                 .type(.toMany)
                 .deleteRule(.cascade)
 
@@ -85,7 +85,7 @@ struct Publisher: EntityWrapper {
 
 struct Series: EntityWrapper {
 
-    var entity: Entity<ComicBookIdentifiers> {
+    var entity: Entity<ComicBookIdentifier> {
         Entity(.series) {
 
             Attribute("name", type: .string)
@@ -93,11 +93,11 @@ struct Series: EntityWrapper {
 
         } relationships: {
 
-            Relationship<ComicBookIdentifiers>("publisher", destination: .publisher, inverse: "series")
+            Relationship<ComicBookIdentifier>("publisher", destination: .publisher, inverse: "series")
                 .type(.toOne)
                 .deleteRule(.nullify)
 
-            Relationship<ComicBookIdentifiers>("comicBooks", destination: .comicBook, inverse: "series")
+            Relationship<ComicBookIdentifier>("comicBooks", destination: .comicBook, inverse: "series")
                 .type(.toMany)
                 .deleteRule(.cascade)
 
@@ -110,7 +110,7 @@ struct Series: EntityWrapper {
 
 struct Event: EntityWrapper {
 
-    var entity: Entity<ComicBookIdentifiers> {
+    var entity: Entity<ComicBookIdentifier> {
         Entity(.event) {
 
             Attribute("name", type: .string)
@@ -118,11 +118,11 @@ struct Event: EntityWrapper {
 
         } relationships: {
 
-            Relationship<ComicBookIdentifiers>("publisher", destination: .publisher, inverse: "events")
+            Relationship<ComicBookIdentifier>("publisher", destination: .publisher, inverse: "events")
                 .type(.toOne)
                 .deleteRule(.nullify)
 
-            Relationship<ComicBookIdentifiers>("comicBooks", destination: .comicBook, inverse: "event")
+            Relationship<ComicBookIdentifier>("comicBooks", destination: .comicBook, inverse: "event")
                 .type(.toMany)
                 .deleteRule(.nullify)
                 .arrangement(isOrdered: true)
@@ -134,7 +134,7 @@ struct Event: EntityWrapper {
 
 struct Box: EntityWrapper {
 
-    var entity: Entity<ComicBookIdentifiers> {
+    var entity: Entity<ComicBookIdentifier> {
         Entity(.box) {
 
             Attribute("name", type: .string)
@@ -142,7 +142,7 @@ struct Box: EntityWrapper {
 
         } relationships: {
 
-            Relationship<ComicBookIdentifiers>("comicBooks", destination: .comicBook, inverse: "box")
+            Relationship<ComicBookIdentifier>("comicBooks", destination: .comicBook, inverse: "box")
                 .type(.toMany)
                 .deleteRule(.nullify)
                 .arrangement(isOrdered: true)
@@ -154,7 +154,7 @@ struct Box: EntityWrapper {
 
 struct Tag: EntityWrapper {
 
-    var entity: Entity<ComicBookIdentifiers> {
+    var entity: Entity<ComicBookIdentifier> {
         Entity(.tag) {
 
             Attribute("name", type: .string)
@@ -162,7 +162,7 @@ struct Tag: EntityWrapper {
 
         } relationships: {
 
-            Relationship<ComicBookIdentifiers>("comicBooks", destination: .comicBook, inverse: "tags")
+            Relationship<ComicBookIdentifier>("comicBooks", destination: .comicBook, inverse: "tags")
                 .type(.toMany)
                 .deleteRule(.nullify)
 
@@ -173,7 +173,7 @@ struct Tag: EntityWrapper {
 
 struct ComicBook: EntityWrapper {
 
-    var entity: Entity<ComicBookIdentifiers> {
+    var entity: Entity<ComicBookIdentifier> {
         Entity(.comicBook) {
 
             Attribute("upc", type: .string)
@@ -192,20 +192,20 @@ struct ComicBook: EntityWrapper {
 
         } relationships: {
 
-            Relationship<ComicBookIdentifiers>("box", destination: .box, inverse: "comicBooks")
+            Relationship<ComicBookIdentifier>("box", destination: .box, inverse: "comicBooks")
                 .type(.toOne)
                 .deleteRule(.nullify)
                 .arrangement(isOrdered: true)
 
-            Relationship<ComicBookIdentifiers>("series", destination: .series, inverse: "comicBooks")
+            Relationship<ComicBookIdentifier>("series", destination: .series, inverse: "comicBooks")
                 .type(.toOne)
                 .deleteRule(.nullify)
 
-            Relationship<ComicBookIdentifiers>("tags", destination: .tag, inverse: "comicBooks")
+            Relationship<ComicBookIdentifier>("tags", destination: .tag, inverse: "comicBooks")
                 .type(.toMany)
                 .deleteRule(.nullify)
 
-            Relationship<ComicBookIdentifiers>("event", destination: .event, inverse: "comicBooks")
+            Relationship<ComicBookIdentifier>("event", destination: .event, inverse: "comicBooks")
                 .type(.toOne)
                 .deleteRule(.nullify)
 

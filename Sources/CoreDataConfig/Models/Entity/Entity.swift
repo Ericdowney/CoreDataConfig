@@ -2,12 +2,26 @@
 import Foundation
 import CoreData
 
-// MARK: Entity
-
 public protocol EntityWrapper {
     associatedtype Identifier: EntityIdentifiable
     
     var entity: Entity<Identifier> { get }
+}
+
+public struct AnyEntityWrapper<Identifier: EntityIdentifiable>: EntityWrapper {
+    
+    public var entity: Entity<Identifier>
+    
+    public init<Wrapper: EntityWrapper>(_ wrapper: Wrapper) where Wrapper.Identifier == Identifier {
+        self.entity = wrapper.entity
+    }
+}
+
+extension EntityWrapper {
+    
+    public func eraseToAny() -> AnyEntityWrapper<Identifier> {
+        .init(self)
+    }
 }
 
 public struct Entity<Identifier: EntityIdentifiable>: Equatable, Codable {
@@ -138,6 +152,11 @@ public struct Entity<Identifier: EntityIdentifiable>: Equatable, Codable {
     }
 }
 
+extension Entity: EntityWrapper {
+    
+    public var entity: Entity<Identifier> { self }
+}
+
 extension Entity {
     
     func createEntityDescriptions() throws -> [NSEntityDescription] {
@@ -160,9 +179,4 @@ extension Entity {
         
         return [description] + subentityDescriptions
     }
-}
-
-extension Entity: EntityWrapper {
-    
-    public var entity: Entity<Identifier> { self }
 }
