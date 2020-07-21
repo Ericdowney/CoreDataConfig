@@ -1,5 +1,6 @@
 
 import XCTest
+import CoreData
 @testable import CoreDataConfig
 
 final class PersistenceLayerTests: XCTestCase {
